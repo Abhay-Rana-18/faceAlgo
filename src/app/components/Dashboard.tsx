@@ -8,14 +8,17 @@ import React, { useState, useRef, useEffect } from "react";
 import Webcam from "react-webcam";
 import { Avatar } from "@mui/material";
 import { findMostSimilarFace } from "../logic/algo";
-import ronaldo from "./../logic/christiano.jpg";
+import ronaldo from "./../logic/Amir.jpg";
+import { useRouter } from 'next/navigation';
 
 export default function () {
+  const router = useRouter();
   const webcamRef = React.useRef(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [isCam, setIsCam] = useState(false);
   const [img, setImg] = useState<String | StaticImageData>(gallery);
   const [users, setUser] = useState<any[]>([]);
+  const [result, setResult] = useState(null);
   const myRef = useRef(null);
   const fetchData = async () => {
     const response = fetch("/api/users");
@@ -24,12 +27,17 @@ export default function () {
   };
   useEffect(() => {
     fetchData();
-    setImg(ronaldo);
+    // setImg(ronaldo);
   }, []);
 
-  const findFaces = async() => {
-    findMostSimilarFace(img, users);
+  const handleClick = (userId: String) => {
+    router.push(`/profile/${userId}`);
   }
+
+  const findFaces = async () => {
+    const res = await findMostSimilarFace(img, users);
+    setResult(res);
+  };
 
   type FileType = File | null; // Define a type for the file
 
@@ -136,17 +144,34 @@ export default function () {
                 ref={myRef}
                 onChange={fileUploadHandle}
               />
-              <div className="btn m-3 p-3 bg-blue-600 text-white text-center w-full" onClick={findFaces}>find</div>
+              <div
+                className="btn my-3 p-3 bg-blue-600 text-white text-center w-full"
+                onClick={findFaces}
+              >
+                find
+              </div>
             </div>
           )}
 
           <div className="matches bg-gray-100 w-[500px] h-[500px]">
-            {users?.map((user) => (
-              <div className="profile m-3 p-2 flex bg-slate-200 rounded-lg" key={user._id}>
+            {/* {result !== null && (
+              <div
+                className="profile m-3 p-2 flex bg-slate-200 rounded-lg"
+                key={result._id}
+              >
+                <Avatar src={result.imageUrl} sx={{ width: 45, height: 45 }} />
+                <div className="mx-2">
+                  <h3 className="name">{result?.email}</h3>
+                  <p className="gender font-light">{result.gender}</p>
+                </div>
+              </div>
+            )} */}
+            {result?.map((user) => (
+              <div className="profile m-3 p-2 flex bg-slate-200 rounded-lg" key={user?._id} onClick={() => {handleClick(user._id)}}>
                 <Avatar src={user?.imageUrl} sx={{ width: 45, height: 45 }} />
                 <div className="mx-2">
                   <h3 className="name">{user?.email}</h3>
-                  <p className="gender font-light">{user.gender}</p>
+                  <p className="gender font-light">{user?.gender}</p>
                 </div>
               </div>
             ))}

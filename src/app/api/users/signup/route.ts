@@ -16,20 +16,23 @@ export async function POST(req: NextRequest) {
     }
     let newUser = new User({ email, password, gender, imageUrl });
     await newUser.save();
-    newUser = JSON.stringify(newUser);
-    const token = await jwt.sign(newUser, "secret123");
+    const payload = {
+      id: newUser._id,
+      email: newUser.email
+    };
+    const token = await jwt.sign(payload, "secret123", {expiresIn: '2000h'});
 
     // Set the token in a cookie
-    cookies().set({
-      name: 'token',
-      value: token,
-      httpOnly: true,
-      maxAge: 604800
-    })
+    // cookies().set({
+    //   name: 'token',
+    //   value: token,
+    //   httpOnly: true,
+    //   maxAge: 604800
+    // })
     return Response.json({ success: true, newUser, token });
   }
-  catch {
-    return Response.json({ success: false, msg: "Error - catch block" });
+  catch(e) {
+    return Response.json({ success: false, msg: e });
   }
 }
 

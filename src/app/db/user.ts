@@ -1,4 +1,13 @@
-import mongoose from 'mongoose';
+import mongoose, { Model, ObjectId } from 'mongoose';
+
+export interface IUser extends Document {
+  _id: ObjectId,
+  email: string;
+  password: string;
+  gender: string;
+  imageUrl: string;
+  // Add other fields as necessary
+}
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -21,11 +30,11 @@ const userSchema = new mongoose.Schema({
     
 });
 
-let User: any;
+let User: Model<IUser>;
 try {
-  User = mongoose.model('users')
+  User = mongoose.model<IUser>("users");;
 } catch (error) {
-  User = mongoose.model('users', userSchema);
+  User = mongoose.model<IUser>('users', userSchema);
 }
 
 // export const User = mongoose.model('User', userSchema);

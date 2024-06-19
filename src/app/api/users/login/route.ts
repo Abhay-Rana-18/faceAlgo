@@ -12,16 +12,21 @@ export async function POST(req: NextRequest) {
     try {
         let user = await User.find({ email, password });
         if (user.length > 0) {
-            user = JSON.stringify(user);
-            const token = await jwt.sign(user, "secret123");
+            const payload = {
+                id: user._id,
+                email: user.email
+              };
+            // user = JSON.stringify(user);
+            const token = await jwt.sign(payload, "secret123", {expiresIn: '2000h'});
+            console.log(token);
 
             // Set the token in a cookie
-            cookies().set({
-                name: 'token',
-                value: token,
-                httpOnly: true,
-                maxAge: 604800
-            })
+            // cookies().set({
+            //     name: 'token',
+            //     value: token,
+            //     httpOnly: true,
+            //     maxAge: 604800
+            // })
             return Response.json({ success: true, user, token });
         }
         else {
