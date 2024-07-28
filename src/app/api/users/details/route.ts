@@ -18,7 +18,7 @@ export async function GET(req: NextApiRequestWithUser, res: NextApiResponse) {
     try {
       // Decodes token id
       console.log("getting user details with the token: "+token);
-      let decoded = jwt.verify(token, "secret123");
+      let decoded = jwt.verify(token, "secret123") as DecodedToken;
       await ensureDbConnect();
       const user = await User.findById(decoded?.id);
       console.log("user deatails: ", user);

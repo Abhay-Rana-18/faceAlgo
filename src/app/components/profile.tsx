@@ -13,8 +13,8 @@ interface UserI {
   imageUrl: string
 };
 
-export default function ({id}) {                   
-  const [user, setUser] = useState<UserI | undefined>();
+export default function ({id}:any) {                   
+  const [user, setUser] = useState<any>();
   const router = useRouter();
   useEffect(() => {
     const fetchUser = async () => {

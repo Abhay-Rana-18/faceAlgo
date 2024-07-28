@@ -10,27 +10,21 @@ interface ServerToClientEvents {
   message: (msg: string) => void;
 }
 
-interface ClientToServerEvents {
-  sendMessage: (msg: string) => void;
-}
-
 interface ChatPageProps {
   id: string;
 }
 
 export default function ChatPage({ id }: ChatPageProps) {
   const dispatch = useDispatch();
-  const [socket, setSocket] = useState<
-    Socket<ServerToClientEvents, ClientToServerEvents> | undefined
-  >(undefined);
+  const [socket, setSocket] = useState<any>(undefined);
   const [message, setMessage] = useState<string>("");
   const [inbox, setInbox] = useState<any>([]);
   const [chats, setChats] = useState<any[]>([]);
   const [currentChat, setCurrentChat] = useState<any>(null);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState<any>();
   const [roomName, setRoomName] = useState("");
   const [typing, setTyping] = useState(false);
-  const [typingTimeout, setTypingTimeout] = useState(null);
+  const [typingTimeout, setTypingTimeout] = useState<any>(null);
   const [isTyping, setIsTyping] = useState("");
   const [display, setDisplay] = useState(false);
 
@@ -82,7 +76,7 @@ export default function ChatPage({ id }: ChatPageProps) {
     });
 
     if (user) {
-      socketInstance.emit("setup", { _id: user._id, email: user.email });
+      socketInstance.emit("setup", { _id: user?._id, email: user?.email });
     }
 
     socketInstance.on("message received", (msg) => {
@@ -141,7 +135,7 @@ export default function ChatPage({ id }: ChatPageProps) {
         if (data.success) {
           socket?.emit("new message", data.msg);
           if (data.success) {
-            setInbox((prevInbox) => [...prevInbox, data.msg]);
+            setInbox((prevInbox: any) => [...prevInbox, data.msg]);
           }
         }
       } catch (error) {
@@ -168,7 +162,7 @@ export default function ChatPage({ id }: ChatPageProps) {
     }
   };
 
-  const handleTyping = async (e) => {
+  const handleTyping = async (e: any) => {
     setMessage(e.target.value);
     if (!typing) {
       setTyping(true);
@@ -252,7 +246,7 @@ export default function ChatPage({ id }: ChatPageProps) {
               </p>
             </div>
             <div className="flex-grow p-4 overflow-auto">
-              {inbox?.map((msg, index) => (
+              {inbox?.map((msg: any, index: any) => (
                 <div
                   key={index}
                   className={`px-2 flex py-1 md:py-2 md:px-3 text-sm lg:text-md lg:px-3 bg-white my-2 shadow w-fit rounded-xl ${

@@ -12,15 +12,15 @@ import { useRouter } from "next/navigation";
 
 export default function () {
   const router = useRouter();
-  const webcamRef = React.useRef(null);
-  const [imageSrc, setImageSrc] = useState(null);
+  const webcamRef = React.useRef<any>(null);
+  const [imageSrc, setImageSrc] = useState<any>(null);
   const [isCam, setIsCam] = useState(false);
-  const [img, setImg] = useState<String | StaticImageData>(
+  const [img, setImg] = useState<any>(
     "/images/gallery.jpg"
   );
   const [users, setUser] = useState<any[]>([]);
-  const [result, setResult] = useState(null);
-  const myRef = useRef(null);
+  const [result, setResult] = useState<any>(null);
+  const myRef = useRef<any>(null);
   const fetchData = async () => {
     const response = fetch("/api/users");
     const data = await (await response).json();
@@ -75,10 +75,11 @@ export default function () {
     }
   };
   const selectFile = () => {
-    myRef.current.click();
+
+    myRef?.current?.click();
   };
   const capture = React.useCallback(() => {
-    const image = webcamRef?.current?.getScreenshot();
+    const image:any = webcamRef?.current?.getScreenshot();
     setImg(image);
     setIsCam(false);
   }, [webcamRef]);

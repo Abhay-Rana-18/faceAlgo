@@ -3,6 +3,10 @@ import { Chat } from "@/app/db/chat";
 import jwt from 'jsonwebtoken';
 import { cookies } from "next/headers";
 
+interface DecodedToken {
+    id: string,
+    email: string
+};
 
 export async function GET() {
     try {
@@ -11,7 +15,7 @@ export async function GET() {
         let token = cookies().get("token")?.value;
         if (token) {
             try {
-                const decoded = jwt.verify(token, secretKey);
+                const decoded = jwt.verify(token, secretKey) as DecodedToken;
                 userId = decoded?.id;
             } catch (error) {
                 console.error("Invalid or expired token", error);

@@ -22,7 +22,7 @@ export async function GET(req: NextApiRequestWithUser, { params }: { params: { i
         let token = cookies().get("token")?.value;
         if (token) {
             try {
-                const decoded = jwt.verify(token, secretKey);
+                const decoded = jwt.verify(token, secretKey) as DecodedToken;
                 userId = decoded?.id;
                 console.log("userid: " + userId);
             } catch (error) {

@@ -33,7 +33,7 @@ const page = () => {
   const [gender, setGender] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [name, setName] = useState("");
-  const [age, setAge] = useState();
+  const [age, setAge] = useState<number>();
   const [status, setStatus] = useState("");
   const [description, setDescription] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -152,7 +152,7 @@ const page = () => {
                   value={email}
                 />
                 <TextField
-                  onChange={(event) => {
+                  onChange={(event:any) => {
                     setAge(event.target.value);
                   }}
                   fullWidth={true}
