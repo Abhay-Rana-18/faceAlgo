@@ -1,9 +1,18 @@
-import ChatPage from "../components/ChatPage";
+// app/chat/[id]/page.tsx
 
-export default function () {
+import ChatPage from '@/app/components/ChatPage';
+
+
+interface Params {
+  id: string;
+}
+
+const Chat = () => {
   return (
     <>
-      <ChatPage />
+      <ChatPage id={''} />
     </>
   );
-}
+};
+
+export default Chat;

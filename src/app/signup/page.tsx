@@ -32,6 +32,10 @@ const page = () => {
   const [password, setPassword] = useState("");
   const [gender, setGender] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [name, setName] = useState("");
+  const [age, setAge] = useState();
+  const [status, setStatus] = useState("");
+  const [description, setDescription] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {
     if (showPassword) {
@@ -67,10 +71,14 @@ const page = () => {
     event.preventDefault();
 
     const data = {
+      name,
       email,
+      age,
+      status,
       password,
       gender,
       imageUrl,
+      description
     };
 
     try {
@@ -81,7 +89,7 @@ const page = () => {
       });
 
       const responseData = await response.json();
-      if (responseData.success) {
+      if (responseData.success && typeof window !== undefined) {
         localStorage.setItem("token", responseData.token);
         router.push("/");
       }
@@ -95,7 +103,7 @@ const page = () => {
       <div>
         <div
           style={{
-            paddingTop: 150,
+            marginTop: 10,
             marginBottom: 10,
             display: "flex",
             justifyContent: "center",
@@ -127,11 +135,31 @@ const page = () => {
               >
                 <TextField
                   onChange={(event) => {
+                    setName(event.target.value);
+                  }}
+                  fullWidth={true}
+                  label="Full Name"
+                  variant="outlined"
+                  value={name}
+                />
+                <TextField
+                  onChange={(event) => {
                     setEmail(event.target.value);
                   }}
                   fullWidth={true}
                   label="Email"
                   variant="outlined"
+                  value={email}
+                />
+                <TextField
+                  onChange={(event) => {
+                    setAge(event.target.value);
+                  }}
+                  fullWidth={true}
+                  label="Age"
+                  type='number'
+                  variant="outlined"
+                  value={age}
                 />
 
                 <FormControl fullWidth={true} variant="outlined">
@@ -176,6 +204,32 @@ const page = () => {
                     <MenuItem value="other">other</MenuItem>
                   </Select>
                 </FormControl>
+
+                <FormControl fullWidth>
+                  <InputLabel id="status">Status</InputLabel>
+                  <Select
+                    labelId="status"
+                    id="demo-simple-select"
+                    label="Status"
+                    value={status}
+                    onChange={(e) => {
+                      setStatus(e.target.value);
+                    }}
+                  >
+                    <MenuItem value="single">single</MenuItem>
+                    <MenuItem value="relationship">relationship</MenuItem>
+                    <MenuItem value="married">married</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  onChange={(event) => {
+                    setDescription(event.target.value);
+                  }}
+                  fullWidth={true}
+                  label="Desciption"
+                  variant="outlined"
+                />
 
                 <TextField
                   onChange={handleChange}

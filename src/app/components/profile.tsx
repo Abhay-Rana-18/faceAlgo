@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import gallery from "../../../public/images/gallery.jpg";
 import Image from "next/image";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface UserI {
   _id: any,
@@ -12,8 +13,9 @@ interface UserI {
   imageUrl: string
 };
 
-export default function ({id}) {                     // id: 6635fa61dd01c19d17e1e560
+export default function ({id}) {                   
   const [user, setUser] = useState<UserI | undefined>();
+  const router = useRouter();
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -36,12 +38,13 @@ export default function ({id}) {                     // id: 6635fa61dd01c19d17e1
       const config = {
         headers: {
           "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
+          authorization: `Bearer ${token}`,
         },
       };
       // const {data} = await axios.post("/api/chat", {id}, config);
-      const {data} = await axios.post("/api/chat", {id}, config);
+      const {data} = await axios.get(`/api/chat/${id}`, config);
       console.log(data);
+      router.push(`/chat/${id}`);
     }
     catch(e) {
       console.log(e);
@@ -52,16 +55,20 @@ export default function ({id}) {                     // id: 6635fa61dd01c19d17e1
       <h1 className="text-center mt-3 font-mono text-lg">User Profile</h1>
       <div className="flex flex-col items-center justify-center h-full mt-5">
         <div className="img">
-          <Image src={user?.imageUrl} width={250} height={300} alt="#" />
+          <img src={user?.imageUrl} width={250} height={300} alt="#" />
         </div>
         <div className="desc p-3">
           <div className="flex">
             <h1>Name: </h1>
+            <p>&nbsp; {user?.name}</p>
+          </div>
+          <div className="flex">
+            <h1>Email: </h1>
             <p>&nbsp; {user?.email}</p>
           </div>
           <div className="flex">
             <h1>Age: </h1>
-            <p>&nbsp; 39</p>
+            <p>&nbsp; {user?.age}</p>
           </div>
           <div className="flex">
             <h1>Gender: </h1>
@@ -69,11 +76,11 @@ export default function ({id}) {                     // id: 6635fa61dd01c19d17e1
           </div>
           <div className="flex">
             <h1>Status: </h1>
-            <p>&nbsp; Single</p>
+            <p>&nbsp; {user?.status}</p>
           </div>
           <div className="flex">
             <h1>About: </h1>
-            <p>&nbsp; Chapri football player....gota</p>
+            <p>&nbsp; {user?.description}</p>
           </div>
         </div>
         <button className="p-2 bg-gray-300" onClick={handleMessage}>Send message</button>

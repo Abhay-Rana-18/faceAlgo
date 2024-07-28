@@ -10,24 +10,40 @@ export interface IUser extends Document {
 }
 
 const userSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        required: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    gender: {
-      type: String,
-      enum: ["male", "female", "other"],
-      required: true
-    },
-    imageUrl: {
-        type: String,
-        require: true
-    },
-    
+  name: {
+    type: String,
+    required: true,
+    default: "admin",
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  age: {
+    type: Number,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["single", "relationship", "married"],
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  gender: {
+    type: String,
+    enum: ["male", "female", "other"],
+    required: true
+  },
+  imageUrl: {
+    type: String,
+    require: true
+  },
+  description: {
+    type: String,
+    default: "",
+  }
 });
 
 let User: Model<IUser>;
@@ -38,4 +54,4 @@ try {
 }
 
 // export const User = mongoose.model('User', userSchema);
-export {User};
+export { User };

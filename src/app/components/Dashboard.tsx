@@ -1,6 +1,5 @@
 "use client";
 import Image, { StaticImageData } from "next/image";
-import gallery from "../../../public/images/gallery.jpg";
 import camera from "../../../public/images/camera.jpg";
 import cam2 from "../../../public/images/cam2.png";
 import cam from "../../../public/images/cam.jpg";
@@ -9,14 +8,16 @@ import Webcam from "react-webcam";
 import { Avatar } from "@mui/material";
 import { findMostSimilarFace } from "../logic/algo";
 import ronaldo from "./../logic/Amir.jpg";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 export default function () {
   const router = useRouter();
   const webcamRef = React.useRef(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [isCam, setIsCam] = useState(false);
-  const [img, setImg] = useState<String | StaticImageData>(gallery);
+  const [img, setImg] = useState<String | StaticImageData>(
+    "/images/gallery.jpg"
+  );
   const [users, setUser] = useState<any[]>([]);
   const [result, setResult] = useState(null);
   const myRef = useRef(null);
@@ -32,7 +33,7 @@ export default function () {
 
   const handleClick = (userId: String) => {
     router.push(`/profile/${userId}`);
-  }
+  };
 
   const findFaces = async () => {
     const res = await findMostSimilarFace(img, users);
@@ -57,7 +58,7 @@ export default function () {
           const url = reader.result;
           setImg(url);
         } else {
-          console.error("Unexpected reader.result type:", reader.result);
+          console.log("Unexpected reader.result type:", reader.result);
         }
       }
     };
@@ -83,57 +84,49 @@ export default function () {
   }, [webcamRef]);
   return (
     <>
-      <div className="">
-        <div className="upload gap-3 flex justify-center mt-2">
+      <div className="upload gap-3 flex justify-center md:mt-2 px-0 md:px-10 flex-col md:flex-row">
+        <div className="first w-full md:w-1/2 px-1">
           {isCam == true ? (
             <>
-              <div className="camera-container w-[500px] h-[500px] bg-gray-200">
+              <div className="camera-container w-full bg-gray-200">
                 <Webcam
                   audio={false}
-                  width={500}
-                  height={500}
+                  width="100%"
                   ref={webcamRef}
+                  className="!w-screen md:!w-full !h-[60vh]"
                 />
                 <button
-                  className="p-2 bg-blue-600 text-white m-auto block mt-5"
+                  className="p-2 bg-blue-600/80 text-white m-auto block mt-5  text-xs sm:text-sm md:text-md lg:text-[1rem]"
                   onClick={capture}
                 >
                   Capture Image
                 </button>
-                <Image
-                  src={cam}
+                <img
+                  src='images/cam.jpg'
                   alt="#"
-                  width={70}
-                  height={70}
-                  className="rounded-full"
+                  className="rounded-full w-[60px] h-[60px] md:w-[70px] md:h-[70px]"
                   onClick={toggleCam}
                 />
               </div>
             </>
           ) : (
-            <div className="w-[500px] h-[500px] bg-gray-200">
-              <Image
-                src={img}
+            <div className="bg-gray-200">
+              <img
+                src={`${img}`}
                 alt="#"
-                width={400}
-                height={0}
-                className="ml-[50px]"
+                className="h-[60vh] m-auto object-cover"
               />
               <div className="select flex justify-center mt-4 gap-2">
-                <Image
-                  src={gallery}
+                <img
+                  src="/images/gallery.jpg"
                   alt="#"
-                  width={70}
-                  height={70}
-                  className="rounded-full"
+                  className="rounded-full w-[60px] h-[60px] md:w-[70px] md:h-[70px]"
                   onClick={selectFile}
                 />
-                <Image
-                  src={cam}
+                <img
+                  src="/images/cam2.png"
                   alt="#"
-                  width={70}
-                  height={70}
-                  className="rounded-full"
+                  className="rounded-full w-[60px] h-[60px] md:w-[70px] md:h-[70px]"
                   onClick={toggleCam}
                 />
               </div>
@@ -145,16 +138,17 @@ export default function () {
                 onChange={fileUploadHandle}
               />
               <div
-                className="btn my-3 p-3 bg-blue-600 text-white text-center w-full"
+                className="btn my-3 bg-blue-600/70 text-white text-center py-2 w-full"
                 onClick={findFaces}
               >
                 find
               </div>
             </div>
           )}
+        </div>
 
-          <div className="matches bg-gray-100 w-[500px] h-[500px]">
-            {/* {result !== null && (
+        <div className="second matches bg-gray-100 md:w-1/2 w-full px-1">
+          {/* {result !== null && (
               <div
                 className="profile m-3 p-2 flex bg-slate-200 rounded-lg"
                 key={result._id}
@@ -166,16 +160,21 @@ export default function () {
                 </div>
               </div>
             )} */}
-            {result?.map((user) => (
-              <div className="profile m-3 p-2 flex bg-slate-200 rounded-lg" key={user?._id} onClick={() => {handleClick(user._id)}}>
-                <Avatar src={user?.imageUrl} sx={{ width: 45, height: 45 }} />
-                <div className="mx-2">
-                  <h3 className="name">{user?.email}</h3>
-                  <p className="gender font-light">{user?.gender}</p>
-                </div>
+          {result?.map((user:any) => (
+            <div
+              className="profile m-3 p-2 flex bg-slate-200 rounded-lg w-full"
+              key={user?._id}
+              onClick={() => {
+                handleClick(user._id);
+              }}
+            >
+              <Avatar src={user?.imageUrl} sx={{ width: 45, height: 45 }} />
+              <div className="mx-2">
+                <h3 className="name">{user?.email}</h3>
+                <p className="gender font-light">{user?.gender}</p>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </>
