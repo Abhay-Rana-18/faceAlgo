@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import axios from "axios";
 import { io, Socket } from "socket.io-client";
 
@@ -15,7 +14,6 @@ interface ChatPageProps {
 }
 
 export default function ChatPage({ id }: ChatPageProps) {
-  const dispatch = useDispatch();
   const [socket, setSocket] = useState<any>(undefined);
   const [message, setMessage] = useState<string>("");
   const [inbox, setInbox] = useState<any>([]);
