@@ -28,7 +28,6 @@ export default function () {
   };
   useEffect(() => {
     fetchData();
-    // setImg(ronaldo);
   }, []);
 
   const handleClick = (userId: String) => {

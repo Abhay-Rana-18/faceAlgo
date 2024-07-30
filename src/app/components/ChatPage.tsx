@@ -14,6 +14,7 @@ interface ChatPageProps {
 }
 
 export default function ChatPage({ id }: ChatPageProps) {
+  const socketURL:any = "https://face-algo-socket.onrender.com";
   const [socket, setSocket] = useState<any>(undefined);
   const [message, setMessage] = useState<string>("");
   const [inbox, setInbox] = useState<any>([]);
@@ -66,7 +67,7 @@ export default function ChatPage({ id }: ChatPageProps) {
   }, []);
 
   useEffect(() => {
-    const socketInstance = io("http://localhost:3001");
+    const socketInstance = io(socketURL);
     setSocket(socketInstance);
 
     socketInstance.on("connect", () => {
@@ -88,7 +89,7 @@ export default function ChatPage({ id }: ChatPageProps) {
   }, [id, user]);
 
   useEffect(() => {
-    const socketInstance = io("http://localhost:3001");
+    const socketInstance = io(socketURL);
     setSocket(socketInstance);
     socketInstance.emit("setup", user);
     socketInstance.on("connected", () => {});
@@ -259,14 +260,14 @@ export default function ChatPage({ id }: ChatPageProps) {
               ))}
             </div>
 
-            <div className="pt-1 bg-green-200/60 w-full ml-2">
-              {isTyping.length > 0 && (
-                <div className="typing bg-blue-400 px-2 flex py-1 text-sm lg:text-md lg:px-3 w-fit rounded-xl my-1">
+            <div className="pt-1 bg-green-200/60 w-full ml-2 fixed bottom-0">
+              {isTyping.length>0 && (
+                <div className="typing bg-blue-200 px-2 flex py-1 text-sm lg:text-md lg:px-3 w-fit rounded-xl my-1">
                   {isTyping + "..."}
                 </div>
               )}
               <div
-                className="flex w-full md:w-[63vw] gap-1 fixed bottom-0"
+                className="flex w-full md:w-[63vw] gap-1"
                 onKeyDown={onEnter}
               >
                 <input

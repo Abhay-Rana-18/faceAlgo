@@ -15,7 +15,12 @@ const middleware = async (req: NextApiRequestWithUser) => {
   if (!token) {
     return new NextResponse(JSON.stringify({ message: 'No token found!' }), { status: 401 });
   }
-  return NextResponse.next();
+  const response = NextResponse.next();
+  // Set CORS headers
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
+  return response;
 };
 
 export const config = {

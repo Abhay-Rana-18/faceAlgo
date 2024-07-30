@@ -4,22 +4,23 @@ import gallery from "../../../public/images/gallery.jpg";
 import Image from "next/image";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { headers } from "next/headers";
 
 interface UserI {
-  _id: any,
-  email: string,
-  password: string,
-  gender: string,
-  imageUrl: string
-};
+  _id: any;
+  email: string;
+  password: string;
+  gender: string;
+  imageUrl: string;
+}
 
-export default function ({id}:any) {                   
+export default function ({ id }: any) {
   const [user, setUser] = useState<any>();
   const router = useRouter();
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const {data} = await axios.get(`/api/users/${String(id)}`);
+        const { data } = await axios.get(`/api/users/${String(id)}`);
         if (data) {
           setUser(data.user);
         } else {
@@ -28,28 +29,19 @@ export default function ({id}:any) {
       } catch (error) {
         console.log(`Error: ${error}`);
       }
-    }
-    fetchUser(); 
+    };
+    fetchUser();
   }, []);
 
-  const handleMessage = async() => {
+  const handleMessage = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-          authorization: `Bearer ${token}`,
-        },
-      };
-      // const {data} = await axios.post("/api/chat", {id}, config);
-      const {data} = await axios.get(`/api/chat/${id}`, config);
+      const { data } = await axios.get(`/api/chat/${id}`);
       console.log(data);
       router.push(`/chat/${id}`);
-    }
-    catch(e) {
+    } catch (e) {
       console.log(e);
     }
-  }
+  };
   return (
     <>
       <h1 className="text-center mt-3 font-mono text-lg">User Profile</h1>
@@ -83,7 +75,10 @@ export default function ({id}:any) {
             <p>&nbsp; {user?.description}</p>
           </div>
         </div>
-        <button className="p-2 bg-gray-300" onClick={handleMessage}>Send message</button>
+
+        <button className="p-2 bg-gray-300" onClick={handleMessage}>
+          Send message
+        </button>
       </div>
     </>
   );

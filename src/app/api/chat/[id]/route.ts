@@ -50,12 +50,14 @@ export async function GET(req: NextApiRequestWithUser, { params }: { params: { i
             // const user = await User.findById(userId);
             // console.log("logged in user: "+user);
             const user1 = await User.findById(id);
-            // console.log("selected user: "+user1);
-            let chat = await Chat.create({
-                chatName: user1?.email,
-                users: [userId, id]
-            });
-            chat = chat.populate("users");
+            let chat = null;
+            if (userId !== id) {
+                chat = await Chat.create({
+                    chatName: user1?.email,
+                    users: [userId, id]
+                });
+                chat = chat.populate("users");
+            }
             return Response.json({ success: true, chat: chat });
         }
         catch (e) {
