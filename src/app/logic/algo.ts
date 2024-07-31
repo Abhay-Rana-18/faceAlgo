@@ -25,6 +25,9 @@ export async function findMostSimilarFace(unknownImageSrc: string, knownFacesDat
     // Load the unknown face image
     const unknownFaceImage = await loadImage(unknownImageSrc);
 
+    // const unknownFaceImage = document.createElement('img');
+    // unknownFaceImage.src = unknownImageSrc;
+
     // Load known faces images
     const knownFacesImages = await Promise.all(
         knownFacesData.map(async (faceData: any) => {
@@ -35,7 +38,7 @@ export async function findMostSimilarFace(unknownImageSrc: string, knownFacesDat
     // Detect face descriptor for the unknown face
     const unknownFaceDetection = await faceapi.detectSingleFace(unknownFaceImage).withFaceLandmarks().withFaceDescriptor();
     const unknownFaceDescriptor = unknownFaceDetection?.descriptor;
-    console.log("Unknown face descriptor:", unknownFaceDescriptor);
+    // console.log("Unknown face descriptor:", unknownFaceDescriptor);
 
     // Detect face descriptors for known faces
     const knownFacesDescriptors = await Promise.all(
@@ -44,7 +47,7 @@ export async function findMostSimilarFace(unknownImageSrc: string, knownFacesDat
             return detection?.descriptor;
         })
     );
-    console.log("Known faces descriptors:", knownFacesDescriptors);
+    // console.log("Known faces descriptors:", knownFacesDescriptors);
 
     // Check if descriptors are defined
     if (!unknownFaceDescriptor) {

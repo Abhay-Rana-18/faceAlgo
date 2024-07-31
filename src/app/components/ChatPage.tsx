@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { io, Socket } from "socket.io-client";
+import Loader from "./Loader";
+import UserContext from "../Context/user/userContext";
 
 // Define custom events interfaces
 interface ServerToClientEvents {
@@ -14,22 +16,29 @@ interface ChatPageProps {
 }
 
 export default function ChatPage({ id }: ChatPageProps) {
-  const socketURL:any = "https://face-algo-socket.onrender.com";
+  // const socketURL:any = "https://face-algo-socket.onrender.com";
+  const socketURL: any = "http://localhost:3001";
+  const {getUser} = useContext<any>(UserContext);
   const [socket, setSocket] = useState<any>(undefined);
   const [message, setMessage] = useState<string>("");
   const [inbox, setInbox] = useState<any>([]);
   const [chats, setChats] = useState<any[]>([]);
   const [currentChat, setCurrentChat] = useState<any>(null);
-  const [user, setUser] = useState<any>();
   const [roomName, setRoomName] = useState("");
   const [typing, setTyping] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const [typingTimeout, setTypingTimeout] = useState<any>(null);
   const [isTyping, setIsTyping] = useState("");
   const [display, setDisplay] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const getChats = async () => {
-    await getUser();
+    setLoading(true);
     try {
+      const d = await getUser();
+      if (d.success) {
+        setUser(d.user);
+      }
       const { data: allChatsData } = await axios.get("/api/chat/");
       setChats(allChatsData.chats);
 
@@ -47,20 +56,22 @@ export default function ChatPage({ id }: ChatPageProps) {
       }
     } catch (error) {
       console.log("Error fetching chats:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getUser = async () => {
-    try {
-      const { data } = await axios.get("/api/users/details");
-      if (data.success) {
-        setUser(data.user);
-        console.log("user: ", data.user);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  // const getUser = async () => {
+  //   try {
+  //     const { data } = await axios.get("/api/users/details");
+  //     if (data.success) {
+  //       setUser(data.user);
+  //       console.log("user: ", data.user);
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
   useEffect(() => {
     getChats();
@@ -144,6 +155,7 @@ export default function ChatPage({ id }: ChatPageProps) {
   };
 
   const handleClick = async (chat: any) => {
+    setLoading(true);
     joinChat(chat?._id);
     setCurrentChat(chat);
     const { data } = await axios.get(`/api/message/${chat?._id}`);
@@ -151,6 +163,7 @@ export default function ChatPage({ id }: ChatPageProps) {
       setInbox(data.msg);
     }
     setDisplay(true);
+    setLoading(false);
   };
 
   const joinChat = (room: string) => {
@@ -185,22 +198,30 @@ export default function ChatPage({ id }: ChatPageProps) {
     }
   };
 
+  if (loading) {
+    return (
+      <>
+        <Loader />
+      </>
+    );
+  }
+
   return (
     <div className="bg-gray-200 m-0 p-0 h-screen flex flex-col">
-      <div className="flex flex-grow overflow-hidden">
+      <div className="flex flex-grow">
         <div
           className={`${
             display ? "hidden" : "w-[100vw]"
-          } md:block md:w-[35vw] bg-green-50 text-black p-4 overflow-auto md:text-md`}
+          } md:block md:w-[35vw] bg-white text-black p-4 overflow-auto md:text-md overflow-y-scroll fixed left-0 top-[3rem] h-full`}
         >
           {chats &&
             chats.length > 0 &&
             chats.map((chat) => (
               <div
                 key={chat._id}
-                className={`p-2 border-b flex gap-3 ${
+                className={`p-2 border-b flex gap-3 rounded-md ${
                   currentChat?._id === chat?._id
-                    ? "bg-black/20"
+                    ? "bg-gray-300"
                     : "bg-green-white"
                 }`}
                 onClick={() => {
@@ -217,8 +238,8 @@ export default function ChatPage({ id }: ChatPageProps) {
                   className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                 />
                 {chat?.users[0].email === user?.email
-                  ? chat?.users[1].email
-                  : chat.users[0].email}
+                  ? chat?.users[1].name
+                  : chat.users[0].name}
               </div>
             ))}
         </div>
@@ -227,11 +248,11 @@ export default function ChatPage({ id }: ChatPageProps) {
           <div
             className={`${
               display ? "w-[100vw]" : "hidden"
-            } md:flex md:w-[65vw] flex flex-col bg-green-200/60`}
+            } md:flex md:w-[65vw] flex flex-col bg-green-100 h-[83%] fixed right-0 top-[3rem] overflow-y-scroll`}
           >
             <div className="w-full text-center p-3 bg-white/40 text-black flex">
               <div
-                className="md:hidden back px-2 bg-black/50 w-fit"
+                className="md:hidden back px-2 bg-white/50 w-fit"
                 onClick={() => {
                   setDisplay(false);
                 }}
@@ -240,8 +261,8 @@ export default function ChatPage({ id }: ChatPageProps) {
               </div>
               <p className="!text-center w-full">
                 {currentChat?.users[0].email === user?.email
-                  ? currentChat?.users[1].email
-                  : currentChat?.users[0].email}
+                  ? currentChat?.users[1].name
+                  : currentChat?.users[0].name}
               </p>
             </div>
             <div className="flex-grow p-4 overflow-auto">
@@ -250,7 +271,7 @@ export default function ChatPage({ id }: ChatPageProps) {
                   key={index}
                   className={`px-2 flex py-1 md:py-2 md:px-3 text-sm lg:text-md lg:px-3 bg-white my-2 shadow w-fit rounded-xl ${
                     msg.sender === user?._id
-                      ? "bg-green-300 ml-auto"
+                      ? "bg-green-400/40 ml-auto"
                       : "bg-white"
                   }`}
                 >
@@ -260,8 +281,8 @@ export default function ChatPage({ id }: ChatPageProps) {
               ))}
             </div>
 
-            <div className="pt-1 bg-green-200/60 w-full ml-2 fixed bottom-0">
-              {isTyping.length>0 && (
+            <div className="pt-1 bg-green-100 w-full ml-2 fixed bottom-0">
+              {isTyping.length > 0 && (
                 <div className="typing bg-blue-200 px-2 flex py-1 text-sm lg:text-md lg:px-3 w-fit rounded-xl my-1">
                   {isTyping + "..."}
                 </div>
@@ -279,10 +300,10 @@ export default function ChatPage({ id }: ChatPageProps) {
                 />
                 <button
                   onClick={sendMessage}
-                  className={`hidden md:flex bg-green-600 !w-[40px] h-[40px] rounded-md`}
+                  className={`md:flex bg-green-200 !w-[40px] h-[40px] rounded-md mr-3 md:mr-0`}
                 >
                   <img
-                    src="/images/send-message.png"
+                    src="/images/send.png"
                     alt="#"
                     width={20}
                     className="m-auto"
@@ -295,9 +316,9 @@ export default function ChatPage({ id }: ChatPageProps) {
           <div
             className={`${
               display ? "w-[100vw]" : "hidden"
-            } md:flex md:w-[65vw] flex flex-col bg-green-200/60`}
+            } md:flex md:w-[65vw] flex flex-col bg-green-200/60 fixed right-0 top-[3rem] h-full items-center`}
           >
-            <p className="text-center align-middle text-xl font-bold mt-[40vh]">
+            <p className="text-center align-middle text-xl font-semibold mt-[40vh]">
               Select a Chat!
             </p>
           </div>

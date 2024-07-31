@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Card,
   TextField,
@@ -17,15 +17,15 @@ import {
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
-import axios from "axios";
-import { SettingsEthernetRounded } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
+import UserContext from "../Context/user/userContext";
 
 const page = () => {
   const router = useRouter();
+  const { userSignup } = useContext<any>(UserContext);
   useEffect(() => {
     if (localStorage.getItem("token")) {
-      // router.push("/");
+      router.push("/");
     }
   });
   const [email, setEmail] = useState("");
@@ -78,29 +78,23 @@ const page = () => {
       password,
       gender,
       imageUrl,
-      description
+      description,
     };
 
     try {
-      const response = await fetch("/api/users/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      const responseData = await response.json();
+      const responseData = await userSignup(data);
       if (responseData.success && typeof window !== undefined) {
         localStorage.setItem("token", responseData.token);
         router.push("/");
       }
-      console.log(responseData); // Handle successful response
+      console.log(responseData);
     } catch (error) {
-      console.error(error); // Handle errors
+      console.error(error);
     }
   };
   return (
     <>
-      <div>
+      <div className="!mt-[3.2rem]">
         <div
           style={{
             marginTop: 10,
@@ -110,14 +104,13 @@ const page = () => {
           }}
         >
           <Typography variant={"h6"}>
-            Welcome to FaceAlog. Sign up below
+            Welcome to FaceAlog.
           </Typography>
         </div>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Card
+            className="!w-[90vw] md:!w-[70vw] !p-0 md:!p-8"
             style={{
-              width: 400,
-              padding: 20,
               display: "flex",
               flexDirection: "column",
               gap: "0.5rem",
@@ -133,94 +126,101 @@ const page = () => {
                   gap: "0.5rem",
                 }}
               >
-                <TextField
-                  onChange={(event) => {
-                    setName(event.target.value);
-                  }}
-                  fullWidth={true}
-                  label="Full Name"
-                  variant="outlined"
-                  value={name}
-                />
-                <TextField
-                  onChange={(event) => {
-                    setEmail(event.target.value);
-                  }}
-                  fullWidth={true}
-                  label="Email"
-                  variant="outlined"
-                  value={email}
-                />
-                <TextField
-                  onChange={(event:any) => {
-                    setAge(event.target.value);
-                  }}
-                  fullWidth={true}
-                  label="Age"
-                  type='number'
-                  variant="outlined"
-                  value={age}
-                />
-
-                <FormControl fullWidth={true} variant="outlined">
-                  <InputLabel htmlFor="outlined-adornment-password">
-                    Password
-                  </InputLabel>
-                  <OutlinedInput
-                    id="outlined-adornment-password"
-                    type={showPassword ? "text" : "password"}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    label="Password"
-                    onChange={(e) => {
-                      setPassword(e.target.value);
+                <div className="flex flex-col gap-2">
+                  <TextField
+                    onChange={(event) => {
+                      setName(event.target.value);
                     }}
+                    fullWidth={true}
+                    label="Full Name"
+                    variant="outlined"
+                    value={name}
                   />
-                </FormControl>
-
-                <FormControl fullWidth>
-                  <InputLabel id="gender">Gender</InputLabel>
-                  <Select
-                    labelId="gender"
-                    id="demo-simple-select"
-                    label="Gender"
-                    value={gender}
-                    onChange={(e) => {
-                      setGender(e.target.value);
+                  <TextField
+                    onChange={(event) => {
+                      setEmail(event.target.value);
                     }}
-                  >
-                    <MenuItem value="male">male</MenuItem>
-                    <MenuItem value="female">female</MenuItem>
-                    <MenuItem value="other">other</MenuItem>
-                  </Select>
-                </FormControl>
+                    fullWidth={true}
+                    label="Email"
+                    variant="outlined"
+                    value={email}
+                  />
+                </div>
 
-                <FormControl fullWidth>
-                  <InputLabel id="status">Status</InputLabel>
-                  <Select
-                    labelId="status"
-                    id="demo-simple-select"
-                    label="Status"
-                    value={status}
-                    onChange={(e) => {
-                      setStatus(e.target.value);
+                <div className="flex gap-2 flex-col md:flex-row">
+                  <TextField
+                    onChange={(event: any) => {
+                      setAge(event.target.value);
                     }}
-                  >
-                    <MenuItem value="single">single</MenuItem>
-                    <MenuItem value="relationship">relationship</MenuItem>
-                    <MenuItem value="married">married</MenuItem>
-                  </Select>
-                </FormControl>
+                    fullWidth={true}
+                    label="Age"
+                    type="number"
+                    variant="outlined"
+                    value={age}
+                  />
+
+                  <FormControl fullWidth={true} variant="outlined">
+                    <InputLabel htmlFor="outlined-adornment-password">
+                      Password
+                    </InputLabel>
+                    <OutlinedInput
+                      id="outlined-adornment-password"
+                      type={showPassword ? "text" : "password"}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Password"
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                      }}
+                    />
+                  </FormControl>
+                </div>
+
+                <div className="flex gap-2 flex-col md:flex-row">
+                  <FormControl fullWidth>
+                    <InputLabel id="gender">Gender</InputLabel>
+                    <Select
+                      labelId="gender"
+                      id="demo-simple-select"
+                      label="Gender"
+                      value={gender}
+                      onChange={(e) => {
+                        setGender(e.target.value);
+                      }}
+                    >
+                      <MenuItem value="male">male</MenuItem>
+                      <MenuItem value="female">female</MenuItem>
+                      <MenuItem value="other">other</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <FormControl fullWidth>
+                    <InputLabel id="status">Status</InputLabel>
+                    <Select
+                      labelId="status"
+                      id="demo-simple-select"
+                      label="Status"
+                      value={status}
+                      onChange={(e) => {
+                        setStatus(e.target.value);
+                      }}
+                    >
+                      <MenuItem value="single">single</MenuItem>
+                      <MenuItem value="relationship">relationship</MenuItem>
+                      <MenuItem value="married">married</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
 
                 <TextField
                   onChange={(event) => {

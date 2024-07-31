@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Card,
   TextField,
@@ -19,6 +19,8 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import UserContext from "../Context/user/userContext";
 // import { cookies } from 'next/headers'
 
 export default function () {
@@ -31,6 +33,7 @@ export default function () {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const {userLogin} = useContext<any>(UserContext);
   const handleClickShowPassword = () => {
     if (showPassword) {
       setShowPassword(false);
@@ -54,19 +57,14 @@ export default function () {
     };
 
     try {
-      const response = await fetch("/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const responseData = await response.json();
+      const responseData = await userLogin(data);
       if (responseData.success) {
+        toast.success("User logined successfully!");
         localStorage.setItem("token", responseData.token);
         router.push("/");
       }
-      console.log(responseData); // Handle successful response
     } catch (error) {
-      console.error(error); // Handle errors
+      toast.warning("Invalid Username/passowrd");
     }
   };
   return (
@@ -81,13 +79,13 @@ export default function () {
           }}
         >
           <Typography variant={"h6"}>
-            Welcome to FaceAlog. Login below
+            Login below
           </Typography>
         </div>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Card
             style={{
-              width: 400,
+              width: 500,
               padding: 20,
               display: "flex",
               flexDirection: "column",
