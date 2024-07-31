@@ -17,6 +17,7 @@ export default function MenuIntroduction() {
   const [user, setUser] = useState<any>(null);
   const { getUser, userLogout } = useContext<any>(UserContext);
   const logoutHandler = async () => {
+    localStorage.removeItem("token");
     userLogout();
   };
   useEffect(() => {
