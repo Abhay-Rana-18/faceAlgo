@@ -16,8 +16,8 @@ interface ChatPageProps {
 }
 
 export default function ChatPage({ id }: ChatPageProps) {
-  // const socketURL:any = "https://face-algo-socket.onrender.com";
-  const socketURL: any = "http://localhost:3001";
+  const socketURL:any = "https://face-algo-socket.onrender.com";
+  // const socketURL: any = "http://localhost:3001";
   const {getUser} = useContext<any>(UserContext);
   const [socket, setSocket] = useState<any>(undefined);
   const [message, setMessage] = useState<string>("");
