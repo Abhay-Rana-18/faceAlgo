@@ -37,8 +37,8 @@ export default function MenuIntroduction() {
 
   return (
     <Dropdown>
-      <MenuButton sx={{ p: 0, borderRadius: "50%" }}>
-        <Avatar alt="Travis Howard" src={user?.imageUrl} className="" />
+      <MenuButton sx={{ p: 0, height:0, width: 30, borderRadius: "50%", bgcolor:'transparent', border:'none'}}>
+        <Avatar alt="A" src={user?.imageUrl} sx={{position: 'relative', bottom: 3}} />
       </MenuButton>
       <Menu slots={{ listbox: AnimatedListbox }} className="z-50">
         <MenuItem onClick={() => {router.push("/chat")}}>Chats</MenuItem>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { io, Socket } from "socket.io-client";
 import Loader from "./Loader";
@@ -16,9 +16,9 @@ interface ChatPageProps {
 }
 
 export default function ChatPage({ id }: ChatPageProps) {
-  const socketURL:any = "https://face-algo-socket.onrender.com";
-  // const socketURL: any = "http://localhost:3001";
-  const {getUser} = useContext<any>(UserContext);
+  // const socketURL:any = "https://face-algo-socket.onrender.com";
+  const socketURL: any = "http://localhost:3001";
+  const { getUser } = useContext<any>(UserContext);
   const [socket, setSocket] = useState<any>(undefined);
   const [message, setMessage] = useState<string>("");
   const [inbox, setInbox] = useState<any>([]);
@@ -61,17 +61,13 @@ export default function ChatPage({ id }: ChatPageProps) {
     }
   };
 
-  // const getUser = async () => {
-  //   try {
-  //     const { data } = await axios.get("/api/users/details");
-  //     if (data.success) {
-  //       setUser(data.user);
-  //       console.log("user: ", data.user);
-  //     }
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
+  const scrollToBottom = () => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+    // console.log(document.documentElement.scrollHeight);
+  };
 
   useEffect(() => {
     getChats();
@@ -150,9 +146,16 @@ export default function ChatPage({ id }: ChatPageProps) {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        scrollToBottom();
       }
     }
   };
+
+  useEffect(() => {
+    // Scroll to the bottom whenever messages change
+    scrollToBottom();
+  }, []);
 
   const handleClick = async (chat: any) => {
     setLoading(true);
@@ -207,7 +210,7 @@ export default function ChatPage({ id }: ChatPageProps) {
   }
 
   return (
-    <div className="bg-gray-200 m-0 p-0 h-screen flex flex-col">
+    <div className="bg-green-100 m-0 p-0 h-screen flex flex-col">
       <div className="flex flex-grow">
         <div
           className={`${
@@ -220,9 +223,7 @@ export default function ChatPage({ id }: ChatPageProps) {
               <div
                 key={chat._id}
                 className={`p-2 border-b flex gap-3 rounded-md ${
-                  currentChat?._id === chat?._id
-                    ? "bg-gray-300"
-                    : "bg-green-white"
+                  currentChat?._id === chat?._id ? "bg-gray-300" : "bg-white"
                 }`}
                 onClick={() => {
                   handleClick(chat);
@@ -248,7 +249,7 @@ export default function ChatPage({ id }: ChatPageProps) {
           <div
             className={`${
               display ? "w-[100vw]" : "hidden"
-            } md:flex md:w-[65vw] flex flex-col bg-green-100 h-[83%] fixed right-0 top-[3rem] overflow-y-scroll`}
+            } md:flex md:w-[65vw] flex flex-col bg-green-100 h-[88%] md:h-[84%] fixed right-0 top-[3rem] overflow-y-scroll`}
           >
             <div className="w-full text-center p-3 bg-white/40 text-black flex">
               <div
@@ -271,7 +272,7 @@ export default function ChatPage({ id }: ChatPageProps) {
                   key={index}
                   className={`px-2 flex py-1 md:py-2 md:px-3 text-sm lg:text-md lg:px-3 bg-white my-2 shadow w-fit rounded-xl ${
                     msg.sender === user?._id
-                      ? "bg-green-400/40 ml-auto"
+                      ? "bg-green-300 ml-auto"
                       : "bg-white"
                   }`}
                 >
@@ -316,7 +317,7 @@ export default function ChatPage({ id }: ChatPageProps) {
           <div
             className={`${
               display ? "w-[100vw]" : "hidden"
-            } md:flex md:w-[65vw] flex flex-col bg-green-200/60 fixed right-0 top-[3rem] h-full items-center`}
+            } md:flex md:w-[65vw] flex flex-col bg-green-100 fixed right-0 top-[3rem] h-full items-center`}
           >
             <p className="text-center align-middle text-xl font-semibold mt-[40vh]">
               Select a Chat!
