@@ -16,8 +16,8 @@ interface ChatPageProps {
 }
 
 export default function ChatPage({ id }: ChatPageProps) {
-  const socketURL:any = "https://face-algo-socket.onrender.com";
-  // const socketURL: any = "http://localhost:3001";
+  // const socketURL:any = "https://face-algo-socket.onrender.com";
+  const socketURL: any = "http://localhost:3001";
   const { getUser } = useContext<any>(UserContext);
   const [socket, setSocket] = useState<any>(undefined);
   const [message, setMessage] = useState<string>("");
@@ -31,6 +31,7 @@ export default function ChatPage({ id }: ChatPageProps) {
   const [isTyping, setIsTyping] = useState("");
   const [display, setDisplay] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [online, setOnline] = useState<any>([]);
 
   const getChats = async () => {
     setLoading(true);
@@ -61,19 +62,13 @@ export default function ChatPage({ id }: ChatPageProps) {
     }
   };
 
-  const scrollToBottom = () => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-    // console.log(document.documentElement.scrollHeight);
-  };
-
   useEffect(() => {
     getChats();
   }, []);
 
   useEffect(() => {
+    if (chats.length === 0 || !user) return; // Exit if chats are not loaded or user is not set
+
     const socketInstance = io(socketURL);
     setSocket(socketInstance);
 
@@ -81,9 +76,33 @@ export default function ChatPage({ id }: ChatPageProps) {
       console.log("Connected to server");
     });
 
-    if (user) {
-      socketInstance.emit("setup", { _id: user?._id, email: user?.email });
-    }
+    socketInstance.emit("setup", { _id: user._id, email: user.email });
+
+    socketInstance.on("online-users", (users) => {
+      // console.log(users);
+      const onlineUsers = users.reduce((acc: any, user: any) => {
+        acc[user] = true;
+        return acc;
+      }, {});
+
+      setOnline(onlineUsers);
+      console.log(onlineUsers);
+
+      const onlineChats = [];
+      const offlineChats = [];
+
+      for (let chat of chats) {
+        if (chat?.users[0]?._id && onlineUsers[chat.users[0]._id]) {
+          onlineChats.push(chat);
+        } else {
+          offlineChats.push(chat);
+        }
+      }
+      // console.log("online: ", onlineChats);
+      // console.log("offline: ", offlineChats);
+      // setOnline(onlineChats);
+      // setOffline(offlineChats);
+    });
 
     socketInstance.on("message received", (msg) => {
       console.log("message received: ", msg);
@@ -93,7 +112,7 @@ export default function ChatPage({ id }: ChatPageProps) {
     return () => {
       socketInstance.disconnect();
     };
-  }, [id, user]);
+  }, [chats, user]);
 
   useEffect(() => {
     const socketInstance = io(socketURL);
@@ -147,15 +166,15 @@ export default function ChatPage({ id }: ChatPageProps) {
       } catch (error) {
         console.log(error);
       } finally {
-        scrollToBottom();
+        // scrollToBottom();
       }
     }
   };
 
-  useEffect(() => {
-    // Scroll to the bottom whenever messages change
-    scrollToBottom();
-  }, []);
+  // useEffect(() => {
+  //   // Scroll to the bottom whenever messages change
+  //   // scrollToBottom();
+  // }, []);
 
   const handleClick = async (chat: any) => {
     setLoading(true);
@@ -230,17 +249,21 @@ export default function ChatPage({ id }: ChatPageProps) {
                 }}
               >
                 <img
-                  src={
-                    chat?.users[0].email === user?.email
-                      ? chat?.users[1].imageUrl
-                      : chat.users[0].imageUrl || ""
-                  }
+                  src={chat.users[0]?._id === user?._id ?  chat.users[1].imageUrl : chat.users[0].imageUrl || ""}
                   alt="#"
                   className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                 />
-                {chat?.users[0].email === user?.email
-                  ? chat?.users[1].name
-                  : chat.users[0].name}
+                <div className="flex gap-3">
+                  <>{chat.users[0]?._id === user?._id ? chat.users[1].name : chat.users[0].name}</>
+                  <div
+                    className={`${
+                      online[chat.users[0]?._id] &&
+                      "bg-green-600 w-2 h-2 rounded-full mt-2"
+                    }`}
+                  >
+                    {online[chat.users[0]._id]}
+                  </div>
+                </div>
               </div>
             ))}
         </div>
@@ -251,7 +274,7 @@ export default function ChatPage({ id }: ChatPageProps) {
               display ? "w-[100vw]" : "hidden"
             } md:flex md:w-[65vw] flex flex-col bg-green-100 h-[88%] md:h-[84%] fixed right-0 top-[3rem] overflow-y-scroll`}
           >
-            <div className="w-full text-center p-3 bg-white/40 text-black flex">
+            <div className="w-full text-center p-1 bg-white/40 text-black flex">
               <div
                 className="md:hidden back px-2 bg-white/50 w-fit"
                 onClick={() => {
@@ -260,11 +283,14 @@ export default function ChatPage({ id }: ChatPageProps) {
               >
                 {"<-"}
               </div>
-              <p className="!text-center w-full">
-                {currentChat?.users[0].email === user?.email
-                  ? currentChat?.users[1].name
-                  : currentChat?.users[0].name}
-              </p>
+              <div className="m-auto">
+                <p className="!text-center w-full text-sm">
+                  {currentChat?.users[0].name}
+                </p>
+                <p className="!text-center w-full text-green-600 text-xs">
+                  {online[currentChat.users[0]._id] ? "online" : ""}
+                </p>
+              </div>
             </div>
             <div className="flex-grow p-4 overflow-auto">
               {inbox?.map((msg: any, index: any) => (
