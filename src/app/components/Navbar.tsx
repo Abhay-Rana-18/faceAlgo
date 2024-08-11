@@ -29,15 +29,6 @@ const Navbar = () => {
       </h1>
       {isLoggedIn ? (
         <div className="register flex gap-1 ml-auto mx-4">
-          {/* <Button
-            variant="contained"
-            onClick={() => {
-              router.push("/chat");
-            }}
-            className="bg-blue-700/80 !text-xs sm:!text-sm md:!text-md lg:!text-[1rem]"
-          >
-            CHATS
-          </Button> */}
           <MenuIntroduction />
         </div>
       ) : (

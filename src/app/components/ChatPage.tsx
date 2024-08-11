@@ -115,17 +115,30 @@ export default function ChatPage({ id }: ChatPageProps) {
   }, [chats, user]);
 
   useEffect(() => {
+    console.log("hello");
     const socketInstance = io(socketURL);
     setSocket(socketInstance);
+  
     socketInstance.emit("setup", user);
-    socketInstance.on("connected", () => {});
+  
+    socketInstance.on("connected", () => {
+      console.log("Connected to socket server");
+    });
+  
     socketInstance.on("typing", (msg) => {
+      console.log("User is typing: ", msg);
       setIsTyping(msg);
     });
+  
     socketInstance.on("stop typing", () => {
       setIsTyping("");
     });
-  }, [id, user]);
+  
+    return () => {
+      socketInstance.disconnect(); // Clean up the socket connection
+    };
+  }, [chats, user]);
+  
 
   const sendMessage = async () => {
     socket?.emit("stop typing", currentChat?._id);
@@ -202,7 +215,6 @@ export default function ChatPage({ id }: ChatPageProps) {
       setTyping(true);
     }
     socket?.emit("typing", currentChat?._id, e.target.value);
-
     // Clear previous timeout and set a new one
     clearTimeout(typingTimeout);
     const typingTimeout1 = setTimeout(() => {
