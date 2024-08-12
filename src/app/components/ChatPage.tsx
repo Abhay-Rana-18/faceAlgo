@@ -297,7 +297,7 @@ export default function ChatPage({ id }: ChatPageProps) {
               </div>
               <div className="m-auto">
                 <p className="!text-center w-full text-sm">
-                  {currentChat?.users[0].name}
+                  {currentChat.users[0]?._id === user?._id ? currentChat.users[1].name : currentChat.users[0].name}
                 </p>
                 <p className="!text-center w-full text-green-600 text-xs">
                   {online[currentChat.users[0]._id] ? "online" : ""}
