@@ -269,7 +269,7 @@ export default function ChatPage({ id }: ChatPageProps) {
                   <>{chat.users[0]?._id === user?._id ? chat.users[1].name : chat.users[0].name}</>
                   <div
                     className={`${
-                      online[chat.users[0]?._id] &&
+                      online[(chat.users[0]?._id === user?._id) ? chat.users[1]?._id : chat.users[0]?._id] &&
                       "bg-green-600 w-2 h-2 rounded-full mt-2"
                     }`}
                   >
@@ -300,7 +300,7 @@ export default function ChatPage({ id }: ChatPageProps) {
                   {currentChat.users[0]?._id === user?._id ? currentChat.users[1].name : currentChat.users[0].name}
                 </p>
                 <p className="!text-center w-full text-green-600 text-xs">
-                  {online[currentChat.users[0]._id] ? "online" : ""}
+                  {online[(currentChat.users[0]?._id === user?._id) ? currentChat.users[1]?._id : currentChat.users[0]?._id] ? "online" : ""}
                 </p>
               </div>
             </div>
